@@ -2,10 +2,8 @@
 
 source "https://rubygems.org"
 
-gem "rails", "~> 7.2.0"
 gem "activeadmin", "~> 4.0.0.beta16"
-gem "propshaft"
-gem "importmap-rails"
+gem "rails", "~> 8.0.0"
 
 group :test do
   gem "pry-byebug"
