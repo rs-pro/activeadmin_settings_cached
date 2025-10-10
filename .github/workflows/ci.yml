@@ -82,7 +82,9 @@ jobs:
         run: npx playwright install chromium
 
       - name: Setup test database
-        run: bundle exec rake db:create db:schema:load
+        run: |
+          cd spec/internal
+          ./bin/rails db:create db:schema:load RAILS_ENV=test
 
       - name: Run tests with coverage
         run: bundle exec rspec --format progress
