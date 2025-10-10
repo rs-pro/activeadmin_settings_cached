@@ -85,7 +85,20 @@ In your application's admin interface, there will now be a new page with these s
 
 ## ActiveAdmin 4 Setup
 
-If you're using ActiveAdmin 4 with Tailwind CSS, ensure your `tailwind.config.js` includes the gem paths:
+### Required Dependencies
+
+ActiveAdmin 4 requires these gems:
+
+```ruby
+# Gemfile
+gem 'activeadmin', '~> 4.0.0.beta16'
+gem 'importmap-rails', '>= 2.0'  # Required by ActiveAdmin 4
+gem 'propshaft'  # Rails 8 default asset pipeline
+```
+
+### Tailwind CSS Configuration
+
+Ensure your `tailwind.config.js` includes the gem paths:
 
 ```javascript
 const { execSync } = require('child_process');

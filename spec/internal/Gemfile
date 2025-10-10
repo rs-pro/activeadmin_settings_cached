@@ -14,6 +14,8 @@ gem 'puma', '>= 5.0'
 
 # ActiveAdmin and dependencies
 gem 'activeadmin', '~> 4.0.0.beta16'
+# ActiveAdmin 4 requires importmap-rails for JavaScript management
+gem 'importmap-rails', '>= 2.0'
 
 # Our gem under test - load from parent directory
 gem 'activeadmin_settings_cached', path: '../..'

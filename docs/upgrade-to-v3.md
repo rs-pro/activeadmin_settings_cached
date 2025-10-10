@@ -195,16 +195,20 @@ If you're upgrading to ActiveAdmin 4.x, follow these additional steps:
 
 #### 3.1 Install ActiveAdmin 4
 
+ActiveAdmin 4 requires importmap-rails for JavaScript management.
+
 ```ruby
 # Gemfile
 gem 'activeadmin', '~> 4.0.0.beta16'
 gem 'propshaft'  # Rails 8 default asset pipeline
-gem 'importmap-rails'  # For JavaScript management
+gem 'importmap-rails', '>= 2.0'  # Required by ActiveAdmin 4
 ```
 
 ```bash
 bundle install
 ```
+
+**Important**: `importmap-rails` is a required dependency for ActiveAdmin 4. It handles JavaScript module loading in the ActiveAdmin interface.
 
 #### 3.2 Set up Tailwind CSS
 
