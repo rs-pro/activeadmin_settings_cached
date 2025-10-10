@@ -18,6 +18,8 @@ class ImportmapStub
   def draw(*); end
   def cache_sweeper(*); self; end
   def execute_if_updated(*); end
+  # Rails 8 / importmap-rails 2.2.2+ compatibility
+  def preloaded_module_packages(*); []; end
 end
 
 module ActiveAdmin
@@ -31,6 +33,11 @@ end
 module ActionView
   module Helpers
     module ImportmapHelperShim
+      # Return our stub importmap instance for view helpers
+      def importmap
+        ActiveAdmin.importmap
+      end
+
       def javascript_importmap_tags(*, **)
         # In tests/dev, include built assets via Rails helpers so Propshaft
         # can resolve digested paths. Use proper Rails asset helpers for Propshaft.
