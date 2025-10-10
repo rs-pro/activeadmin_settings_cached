@@ -2,19 +2,17 @@
 
 module ActiveadminSettingsCached
   module Options
-    VALID_OPTIONS = [
-      :model_name,
-      :template,
-      :template_object,
-      :display,
-      :title,
-      :after_save
+    VALID_OPTIONS = %i[
+      model_name
+      template
+      template_object
+      display
+      title
+      after_save
     ].freeze
 
     def self.options_for(options = {})
-      unless options[:template_object]
-        options[:template_object] = ::ActiveadminSettingsCached::Model.new(options)
-      end
+      options[:template_object] = ::ActiveadminSettingsCached::Model.new(options) unless options[:template_object]
 
       {
         template: 'admin/settings/index',

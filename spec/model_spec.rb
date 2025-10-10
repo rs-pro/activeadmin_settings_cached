@@ -3,8 +3,8 @@
 RSpec.describe ActiveadminSettingsCached::Model do
   include ActiveModel::Lint::Tests
 
-  ActiveModel::Lint::Tests.public_instance_methods.map{|m| m.to_s}.grep(/^test/).each do |m|
-    example m.gsub('_',' ') do
+  ActiveModel::Lint::Tests.public_instance_methods.map(&:to_s).grep(/^test/).each do |m|
+    example m.gsub('_', ' ') do
       send m
     end
   end
@@ -37,7 +37,7 @@ RSpec.describe ActiveadminSettingsCached::Model do
     {}
   end
 
-  context '#attributes' do
+  describe '#attributes' do
     before do
       ActiveadminSettingsCached.config.display = {}
     end
@@ -55,26 +55,26 @@ RSpec.describe ActiveadminSettingsCached::Model do
     end
   end
 
-  context '#field_options' do
+  describe '#field_options' do
     it 'with string field' do
-      object = described_class.new(all_options.merge({display: {'app_name' => :string}}))
+      object = described_class.new(all_options.merge({ display: { 'app_name' => :string } }))
       options = object.field_options('app_name', 'Test App')
       expect(options[:as]).to eq(:string)
       expect(options[:input_html][:value]).to eq('Test App')
-      expect(options[:label]).to eq(false)
+      expect(options[:label]).to be(false)
     end
 
     it 'with boolean field' do
-      object = described_class.new(all_options.merge({display: {'maintenance_mode' => :boolean}}))
+      object = described_class.new(all_options.merge({ display: { 'maintenance_mode' => :boolean } }))
       options = object.field_options('maintenance_mode', false)
       expect(options[:as]).to eq(:boolean)
-      expect(options[:input_html][:checked]).to eq(false)
+      expect(options[:input_html][:checked]).to be(false)
       expect(options[:checked_value]).to eq('true')
       expect(options[:unchecked_value]).to eq('false')
     end
 
     it 'with integer field' do
-      object = described_class.new(all_options.merge({display: {'max_upload_size' => :number}}))
+      object = described_class.new(all_options.merge({ display: { 'max_upload_size' => :number } }))
       options = object.field_options('max_upload_size', 10)
       expect(options[:as]).to eq(:number)
       expect(options[:input_html][:value]).to eq(10)
@@ -82,25 +82,25 @@ RSpec.describe ActiveadminSettingsCached::Model do
 
     it 'with array field' do
       # Test with the preferences hash field
-      object = described_class.new(all_options.merge({display: {'preferences' => :hash}}))
-      options = object.field_options('preferences', {theme: 'light'})
+      object = described_class.new(all_options.merge({ display: { 'preferences' => :hash } }))
+      options = object.field_options('preferences', { theme: 'light' })
       expect(options[:as]).to eq(:hash)
-      expect(options[:input_html][:value]).to eq({theme: 'light'})
+      expect(options[:input_html][:value]).to eq({ theme: 'light' })
     end
   end
 
-  context '#settings' do
+  describe '#settings' do
     it 'returns all settings as hash' do
       object = described_class.new(all_options)
       settings = object.settings
       expect(settings).to be_a(Hash)
       expect(settings['app_name']).to eq('Test App')
-      expect(settings['maintenance_mode']).to eq(false)
+      expect(settings['maintenance_mode']).to be(false)
       expect(settings['max_upload_size']).to eq(10)
     end
   end
 
-  context '#save' do
+  describe '#save' do
     it 'saves settings' do
       object = described_class.new(all_options)
       object.save('app_name', 'Updated Name')
@@ -111,17 +111,17 @@ RSpec.describe ActiveadminSettingsCached::Model do
     end
   end
 
-  context '#display' do
+  describe '#display' do
     it 'returns display options' do
-      object = described_class.new(all_options.merge({display: {'app_name' => :string}}))
-      expect(object.display).to eq({'app_name' => :string})
+      object = described_class.new(all_options.merge({ display: { 'app_name' => :string } }))
+      expect(object.display).to eq({ 'app_name' => :string })
     end
   end
 
-  context '#persisted?' do
+  describe '#persisted?' do
     it 'returns false' do
       object = described_class.new(all_options)
-      expect(object.persisted?).to eq(false)
+      expect(object.persisted?).to be(false)
     end
   end
 

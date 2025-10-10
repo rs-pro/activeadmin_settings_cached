@@ -3,7 +3,7 @@
 ENV['RAILS_ENV'] ||= 'test'
 
 # Load the Rails test app
-require File.expand_path('../internal/config/environment', __FILE__)
+require File.expand_path('internal/config/environment', __dir__)
 
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
@@ -13,7 +13,7 @@ require 'capybara/rails'
 require 'database_cleaner/active_record'
 
 # Load support files
-Dir[File.expand_path('../support/**/*.rb', __FILE__)].each { |f| require f }
+Dir[File.expand_path('support/**/*.rb', __dir__)].each { |f| require f }
 
 # Configure RSpec
 RSpec.configure do |config|
@@ -27,7 +27,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with(:truncation)
   end
 
-  config.around(:each) do |example|
+  config.around do |example|
     DatabaseCleaner.cleaning do
       example.run
     end

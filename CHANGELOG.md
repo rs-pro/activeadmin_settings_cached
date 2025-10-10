@@ -1,4 +1,6 @@
-# v3.0.0 (Unreleased)
+# v3.0.0 (2025-10-10)
+
+**Upgrade Guide:** See [docs/upgrade-to-v3.md](docs/upgrade-to-v3.md) for detailed upgrade instructions.
 
 ## Breaking Changes
 

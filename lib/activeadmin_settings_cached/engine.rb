@@ -12,7 +12,7 @@ module ActiveadminSettingsCached
     # Include DSL directly - ActiveAdmin 4 may not consistently fire on_load hooks
     initializer 'activeadmin_settings_cached.dsl', before: :load_config_initializers do
       require 'activeadmin_settings_cached/dsl'
-      ::ActiveAdmin::DSL.send(:include, ::ActiveadminSettingsCached::DSL)
+      ::ActiveAdmin::DSL.include ::ActiveadminSettingsCached::DSL
     end
   end
 end

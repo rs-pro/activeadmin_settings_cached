@@ -6,9 +6,9 @@ source 'https://rubygems.org'
 gem 'activeadmin', '~> 4.0.0.beta16'
 
 group :test do
+  gem 'propshaft'
   gem 'pry-byebug'
   gem 'puma'
-  gem 'propshaft'
 end
 
 gemspec

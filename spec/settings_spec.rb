@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'settings', type: :feature, js: true do
+RSpec.describe 'settings', :js, type: :feature do
   before do
     # Initialize settings using rails-settings-cached 2.x API
     Setting.app_name = 'Test App'
@@ -19,7 +19,7 @@ RSpec.describe 'settings', type: :feature, js: true do
 
   shared_examples_for 'render input with value' do |input_value|
     it 'has input with value' do
-      expect(page).to have_selector("input[value='#{input_value}']")
+      expect(page).to have_css("input[value='#{input_value}']")
     end
   end
 
@@ -33,7 +33,7 @@ RSpec.describe 'settings', type: :feature, js: true do
 
       expect(Setting.app_name).to eq 'Updated App'
       expect(Setting.site_title).to eq 'Updated Site'
-      expect(Setting.maintenance_mode).to eq true
+      expect(Setting.maintenance_mode).to be true
     end
   end
 
@@ -96,7 +96,7 @@ RSpec.describe 'settings', type: :feature, js: true do
   describe 'with after_save' do
     context 'when right object' do
       before do
-        after_save = ->() {}
+        after_save = -> {}
         display_settings = {
           'app_name' => 'string',
           'site_title' => 'string',
@@ -120,7 +120,7 @@ RSpec.describe 'settings', type: :feature, js: true do
 
     context 'when only open' do
       before do
-        after_save = ->() {}
+        after_save = -> {}
 
         expect(after_save).not_to receive(:call)
 
