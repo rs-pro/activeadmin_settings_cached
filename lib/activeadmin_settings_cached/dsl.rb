@@ -31,12 +31,11 @@ module ActiveadminSettingsCached
           options[:template_object].save(field_name, value)
         end
 
-        # coercion.cast_params(settings_params) do |name, value|
-        #   options[:template_object].save(name, value)
-        # end
-
         flash[:success] = t('activeadmin_settings_cached.settings.update.success'.freeze)
-        Rails.version.to_i >= 5 ? redirect_back(fallback_location: admin_root_path) : redirect_to(:back)
+
+        # Rails 7+ uses redirect_back_or_to
+        redirect_back_or_to admin_root_path
+
         options[:after_save].call if options[:after_save].respond_to?(:call)
       end
 

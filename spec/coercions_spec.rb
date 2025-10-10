@@ -26,7 +26,7 @@ RSpec.describe ActiveadminSettingsCached::Coercions do
   end
 
   subject(:coercions) do
-    ActiveadminSettingsCached::Coercions.new(defaults, display)
+    ActiveadminSettingsCached::Coercions.new(defaults)
   end
 
   context 'when params is valid' do
