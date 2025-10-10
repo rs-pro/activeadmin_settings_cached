@@ -1,0 +1,89 @@
+# RuboCop configuration for activeadmin_settings_cached
+
+plugins:
+  - rubocop-capybara
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rspec_rails
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.2
+  Exclude:
+    - 'spec/internal/**/*'
+    - 'gemfiles/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+
+# Gem
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+# RSpec
+
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/ExpectInHook:
+  Enabled: false
+
+RSpec/NoExpectationExample:
+  Enabled: false
+
+RSpec/BeforeAfterAll:
+  Enabled: false
+
+# Style preferences
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# Layout
+Layout/LineLength:
+  Max: 130
+  Exclude:
+    - 'activeadmin_settings_cached.gemspec'
+
+# Metrics
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'config/**/*'
+    - 'lib/tasks/**/*'
+    - 'activeadmin_settings_cached.gemspec'
+
+Metrics/MethodLength:
+  Max: 25
+  Exclude:
+    - 'spec/**/*'
+
+Metrics/AbcSize:
+  Max: 30
+  Exclude:
+    - 'spec/**/*'
+
+# Lint
+Lint/DuplicateMethods:
+  Enabled: false

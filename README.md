@@ -1,10 +1,28 @@
 # Activeadmin Settings Cached
 
 [![Gem Version](https://badge.fury.io/rb/activeadmin_settings_cached.svg)](http://badge.fury.io/rb/activeadmin_settings_cached)
-[![Build Status](https://travis-ci.org/artofhuman/activeadmin_settings_cached.svg?branch=master)](https://travis-ci.org/artofhuman/activeadmin_settings_cached)
-[![Coverage Status](https://coveralls.io/repos/github/artofhuman/activeadmin_settings_cached/badge.svg?branch=master)](https://coveralls.io/github/artofhuman/activeadmin_settings_cached?branch=master)
+[![CI](https://github.com/rs-pro/activeadmin_settings_cached/workflows/CI/badge.svg)](https://github.com/rs-pro/activeadmin_settings_cached/actions)
 
 Provides a nice UI interface for [rails-settings-cached](https://github.com/huacnlee/rails-settings-cached) gem in [Active Admin](http://activeadmin.info/).
+
+## Version 3.0 - ActiveAdmin 4 & Rails 8 Support! 🎉
+
+**New in 3.0:**
+- ✅ Full **ActiveAdmin 4.x** support with Tailwind CSS
+- ✅ **Rails 7.0-8.0** compatibility
+- ✅ **Ruby 3.2+** support
+- ✅ Modern testing with Playwright
+- ✅ GitHub Actions CI
+
+**Upgrading from 1.x or 2.x?** See [Upgrade Guide](docs/upgrade-to-v3.md) for step-by-step instructions.
+
+## Compatibility
+
+| activeadmin_settings_cached | ActiveAdmin  | Rails       | Ruby      | rails-settings-cached |
+|-----------------------------|--------------|-------------|-----------|----------------------|
+| 3.x                         | 2.0+ & 4.x   | 7.0-8.0     | 3.2+      | 2.0+                 |
+| 2.x                         | 1.0-2.x      | 5.0-6.x     | 2.5+      | 0.5-2.x              |
+| 1.x                         | 1.0          | 4.2-5.x     | 2.0+      | 0.x                  |
 
 ## Installation
 
@@ -42,15 +60,71 @@ ActiveAdmin.register_page 'Setting' do
 end
 ```
 
-And configure your default values in your Settings model:
+And configure your default values in your Settings model with rails-settings-cached 2.x syntax:
 
 ``` ruby
-class Settings < RailsSettings::CachedSettings
-  defaults[:my_awesome_settings] = 'This is my settings'
+class Setting < RailsSettings::Base
+  # Use field declarations (rails-settings-cached 2.x)
+  field :my_awesome_settings, default: 'This is my settings', type: :string
+
+  # Group settings with scopes (for UI organization)
+  scope :application do
+    field :app_name, default: 'My App', type: :string
+    field :admin_email, default: 'admin@example.com', type: :string
+  end
+
+  scope :features do
+    field :enable_notifications, default: true, type: :boolean
+  end
 end
 ```
 
-In your application's admin interface, there will now be a new page with this setting
+**Note:** rails-settings-cached 2.x uses field-based declarations. See [upgrade guide](docs/upgrade-to-v3.md) if migrating from 0.x.
+
+In your application's admin interface, there will now be a new page with these settings
+
+## ActiveAdmin 4 Setup
+
+### Required Dependencies
+
+ActiveAdmin 4 requires these gems:
+
+```ruby
+# Gemfile
+gem 'activeadmin', '~> 4.0.0.beta16'
+gem 'importmap-rails', '>= 2.0'  # Required by ActiveAdmin 4
+gem 'propshaft'  # Rails 8 default asset pipeline
+```
+
+### Tailwind CSS Configuration
+
+Ensure your `tailwind.config.js` includes the gem paths:
+
+```javascript
+const { execSync } = require('child_process');
+const activeAdminPath = execSync('bundle show activeadmin', {
+  encoding: 'utf-8'
+}).trim();
+
+module.exports = {
+  content: [
+    `${activeAdminPath}/app/views/**/*.{arb,erb,html,rb}`,
+    './app/admin/**/*.{arb,erb,html,rb}',
+    './app/views/**/*.{arb,erb,html,rb}',
+    // Include this gem's views
+    './vendor/bundle/ruby/*/gems/activeadmin_settings_cached-*/app/**/*.rb',
+    './vendor/bundle/ruby/*/gems/activeadmin_settings_cached-*/lib/**/*.rb',
+  ],
+  // ... rest of config
+};
+```
+
+Then rebuild your assets:
+```bash
+npm run build:css  # or your CSS build command
+```
+
+For complete ActiveAdmin 4 setup instructions, see [docs/upgrade-to-v3.md](docs/upgrade-to-v3.md#step-3-activeadmin-4-setup-if-upgrading-to-aa4).
 
 ## active_admin_settings_page DSL
 
@@ -118,11 +192,34 @@ Available options see [here](https://github.com/justinfrench/formtastic#the-avai
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-## How run local example
+## Development
 
+### Running Tests
+
+```bash
+# Install dependencies
+bundle install
+cd spec/internal
+npm install
+npm run build
+
+# Run all tests
+cd ../..
+bundle exec rspec
+
+# Run tests with specific Rails version
+bundle exec appraisal rails-8.0-active-admin-4.x rspec
 ```
-make bash
-make setup
-cd spec/rails/rails-5.1.7/
-BUNDLE_GEMFILE=/app/gemfiles/rails5.1.gemfile bundle exec rails s -b 0.0.0.0
+
+### Running the Test App
+
+```bash
+# Start the development server
+bundle exec rackup
+
+# Visit http://localhost:9292/admin
 ```
+
+## License
+
+MIT License. See LICENSE file for details.

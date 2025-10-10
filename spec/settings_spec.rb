@@ -1,70 +1,39 @@
 # frozen_string_literal: true
 
-RSpec.describe 'settings', type: :feature, js: true do
+RSpec.describe 'settings', :js, type: :feature do
   before do
-    Setting['some'] = {
-      'first_setting' => 'CCC',
-      'second_setting' => false
-    }
-    Setting['base.first_setting'] = 'AAA'
-    Setting['base.second_setting'] = true
-    Setting['second.first_setting'] = false
-    Setting['second.second_setting'] = 'BBB'
+    # Initialize settings using rails-settings-cached 2.x API
+    Setting.app_name = 'Test App'
+    Setting.site_title = 'Test Site'
+    Setting.admin_email = 'admin@example.com'
+    Setting.maintenance_mode = false
+    Setting.enable_notifications = true
+    Setting.max_upload_size = 10
+    Setting.api_timeout = 30.5
+    Setting.preferences = { theme: 'light', language: 'en' }
   end
 
-  let(:initial_some_settings) do
-    {
-      first_setting: 'CCC',
-      second_setting: false
-    }.with_indifferent_access
+  after do
+    Setting.clear_cache
   end
 
   shared_examples_for 'render input with value' do |input_value|
     it 'has input with value' do
-      expect(page).to have_selector("input[value='#{input_value}']")
+      expect(page).to have_css("input[value='#{input_value}']")
     end
   end
 
-  shared_examples_for 'fill and save base settings to db' do
-    it 'saves base settings to db' do
-      fill_in('settings_base.first_setting', with: 'First')
-      uncheck('settings_base.second_setting')
-      fill_in('settings_base.third_setting', with: '100')
-      fill_in('settings_base.four_setting', with: '50.5')
-      fill_in('settings_base.five_setting', with: 'five')
-
-      submit
-
-      expect(Setting['base.first_setting']).to eq 'First'
-      expect(Setting['base.second_setting']).to eq false
-      expect(Setting['base.third_setting']).to eq 100
-      expect(Setting['base.four_setting']).to eq 50.5
-      expect(Setting['base.five_setting']).to eq :five
-    end
-  end
-
-  shared_examples_for 'fill and save second settings to db' do
+  shared_examples_for 'fill and save settings to db' do
     it 'saves settings to db' do
-      fill_in('settings_second.second_setting', with: 'Awesome second')
-      check('settings_second.first_setting')
+      fill_in('settings_app_name', with: 'Updated App')
+      fill_in('settings_site_title', with: 'Updated Site')
+      check('settings_maintenance_mode')
 
       submit
 
-      expect(Setting['second.second_setting']).to eq 'Awesome second'
-      expect(Setting['second.first_setting']).to eq true
-      expect(Setting.some.with_indifferent_access).to eq(initial_some_settings)
-    end
-  end
-
-  shared_examples_for 'fill and save some settings to db' do
-    it 'save some settings to db' do
-      fill_in('settings_some.first_setting', with: 'Awesome value')
-      check('settings_some.second_setting')
-
-      submit
-
-      expect(Setting['some']['first_setting']).to eq 'Awesome value'
-      expect(Setting['some']['second_setting']).to eq true
+      expect(Setting.app_name).to eq 'Updated App'
+      expect(Setting.site_title).to eq 'Updated Site'
+      expect(Setting.maintenance_mode).to be true
     end
   end
 
@@ -72,34 +41,25 @@ RSpec.describe 'settings', type: :feature, js: true do
     before do
       ActiveadminSettingsCached.configure do |config|
         config.display = {
-          'base.first_setting'    => 'string',
-          'base.second_setting'   => 'boolean',
-          'base.third_setting'    => 'number',
-          'base.four_setting'     => 'number',
-          'base.five_setting'     => 'string',
-          'second.first_setting'  => 'boolean',
-          'second.second_setting' => 'string',
-          'some.first_setting'    => 'string',
-          'some.second_setting'   => 'boolean'
+          'app_name' => 'string',
+          'site_title' => 'string',
+          'admin_email' => 'string',
+          'maintenance_mode' => 'boolean',
+          'enable_notifications' => 'boolean',
+          'max_upload_size' => 'number',
+          'api_timeout' => 'number'
         }
       end
 
-      add_setting_resource
-      add_second_setting_resource
-      add_some_setting_resource
-      add_all_setting_resource
+      add_settings_resource
     end
 
-    context 'all setting index' do
+    context 'settings index' do
       before { visit '/admin/settings' }
 
-      it_behaves_like 'render input with value', 'AAA'
-      it_behaves_like 'render input with value', 'BBB'
-
-      # TODO: fixme
-      # it_behaves_like 'render input with value', Setting['some'].with_indifferent_access
-      it_behaves_like 'fill and save base settings to db'
-      it_behaves_like 'fill and save second settings to db'
+      it_behaves_like 'render input with value', 'Test App'
+      it_behaves_like 'render input with value', 'Test Site'
+      it_behaves_like 'fill and save settings to db'
     end
   end
 
@@ -107,171 +67,94 @@ RSpec.describe 'settings', type: :feature, js: true do
     context 'when right object' do
       before do
         display_settings = {
-          'base.first_setting'    => 'string',
-          'base.second_setting'   => 'boolean',
-          'base.third_setting'    => 'number',
-          'base.four_setting'     => 'number',
-          'base.five_setting'     => 'string',
-          'second.first_setting'  => 'boolean',
-          'second.second_setting' => 'string'
+          'app_name' => 'string',
+          'site_title' => 'string',
+          'maintenance_mode' => 'boolean'
         }
 
-        add_all_setting_resource(
+        add_settings_resource(
           template_object: ActiveadminSettingsCached::Model.new(display: display_settings)
         )
 
-        visit '/admin/base_settings'
+        visit '/admin/settings'
       end
 
-      it_behaves_like 'render input with value', 'AAA'
+      it_behaves_like 'render input with value', 'Test App'
     end
 
     context 'when wrong object' do
       before do
-        add_all_setting_resource(template_object: nil)
+        add_settings_resource(template_object: nil)
 
-        visit '/admin/base_settings'
+        visit '/admin/settings'
       end
 
-      it_behaves_like 'render input with value', 'AAA'
+      it_behaves_like 'render input with value', 'Test App'
     end
   end
 
   describe 'with after_save' do
     context 'when right object' do
       before do
-        after_save = ->() {}
+        after_save = -> {}
         display_settings = {
-          'base.first_setting'    => 'string',
-          'base.second_setting'   => 'boolean',
-          'base.third_setting'    => 'number',
-          'base.four_setting'     => 'number',
-          'base.five_setting'     => 'string',
-          'second.first_setting'  => 'boolean',
-          'second.second_setting' => 'string'
+          'app_name' => 'string',
+          'site_title' => 'string',
+          'maintenance_mode' => 'boolean'
         }
 
         expect(after_save).to receive(:call).and_call_original
 
-        add_some_setting_resource(
+        add_settings_resource(
           template_object: ActiveadminSettingsCached::Model.new(display: display_settings),
           after_save: after_save
         )
 
-        visit '/admin/some_settings'
+        visit '/admin/settings'
 
         submit
       end
 
-      it_behaves_like 'render input with value', 'AAA'
+      it_behaves_like 'render input with value', 'Test App'
     end
 
     context 'when only open' do
       before do
-        after_save = ->() {}
+        after_save = -> {}
 
         expect(after_save).not_to receive(:call)
 
-        add_some_setting_resource(template_object: nil,
-                                  after_save: after_save)
+        add_settings_resource(template_object: nil, after_save: after_save)
 
-        visit '/admin/some_settings'
+        visit '/admin/settings'
       end
 
-      it_behaves_like 'render input with value', 'CCC'
+      it_behaves_like 'render input with value', 'Test App'
     end
 
     context 'when wrong object' do
       before do
-        add_some_setting_resource(template_object: nil,
-                                  after_save: 'some')
+        add_settings_resource(template_object: nil, after_save: 'some')
 
-        visit '/admin/some_settings'
+        visit '/admin/settings'
       end
 
-      it_behaves_like 'render input with value', 'CCC'
-    end
-  end
-
-  context 'when settings on different pages' do
-    before do
-      ActiveadminSettingsCached.configure do |config|
-        config.display = {}
-      end
-
-      add_setting_resource(
-        display: {
-          'base.first_setting'  => 'string',
-          'base.second_setting' => 'boolean',
-          'base.third_setting'  => 'number',
-          'base.four_setting'   => 'number',
-          'base.five_setting'   => 'string'
-        }
-      )
-
-      add_second_setting_resource(
-        display: {
-          'second.first_setting'  => 'boolean',
-          'second.second_setting' => 'string'
-        }
-      )
-
-      add_some_setting_resource(
-        display: {
-          'some.first_setting'  => 'string',
-          'some.second_setting' => 'boolean'
-        }
-      )
-
-      add_all_setting_resource(
-        display: {
-          'base.first_setting'    => 'string',
-          'base.second_setting'   => 'boolean',
-          'base.third_setting'    => 'number',
-          'base.four_setting'     => 'number',
-          'base.five_setting'     => 'string',
-          'second.first_setting'  => 'boolean',
-          'second.second_setting' => 'string'
-        }
-      )
-    end
-
-    context 'base settings page' do
-      before { visit '/admin/base_settings' }
-
-      it_behaves_like 'render input with value', 'AAA'
-      it_behaves_like 'fill and save base settings to db'
-    end
-
-    context 'second setting page' do
-      before { visit '/admin/second_settings' }
-
-      it_behaves_like 'render input with value', 'BBB'
-      it_behaves_like 'fill and save second settings to db'
-    end
-
-    context 'some setting index' do
-      before { visit '/admin/some_settings' }
-
-      it_behaves_like 'render input with value', 'CCC'
-      it_behaves_like 'fill and save some settings to db'
-    end
-
-    context 'all setting index' do
-      before { visit '/admin/settings' }
-
-      it_behaves_like 'render input with value', 'AAA'
-      it_behaves_like 'render input with value', 'BBB'
-      # FIXME
-      #it_behaves_like 'render input with value', Setting['some'].with_indifferent_access
-
-      it_behaves_like 'fill and save base settings to db'
-      it_behaves_like 'fill and save second settings to db'
-      it { expect(Setting.some.with_indifferent_access).to eq(initial_some_settings) }
+      it_behaves_like 'render input with value', 'Test App'
     end
   end
 
   def submit
     click_on('Save Settings')
+  end
+
+  def add_settings_resource(options = {})
+    options = { model_name: 'Setting', title: 'Settings' }.merge!(options)
+
+    ActiveAdmin.register_page options[:title] do
+      menu label: options[:title], priority: 99
+      active_admin_settings_page(options)
+    end
+
+    Rails.application.reload_routes!
   end
 end

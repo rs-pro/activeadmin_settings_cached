@@ -16,3 +16,9 @@
 .idea
 mkmf.log
 /gemfiles/*.lock
+spec/internal/node_modules/
+spec/internal/app/assets/builds/
+spec/internal/log/*.log
+spec/internal/storage/*.sqlite3*
+spec/internal/tmp/
+spec/internal/package-lock.json

@@ -1,0 +1,20 @@
+{
+  "name": "activeadmin_settings_cached_test",
+  "private": true,
+  "devDependencies": {
+    "esbuild": "^0.25.9"
+  },
+  "scripts": {
+    "build:js": "node esbuild.config.js",
+    "build:css": "bundle exec rake active_admin:build",
+    "build": "npm run build:js && npm run build:css",
+    "watch:js": "node esbuild.config.js --watch",
+    "watch:css": "bundle exec rake active_admin:watch",
+    "watch": "npm run watch:js"
+  },
+  "dependencies": {
+    "@activeadmin/activeadmin": "^4.0.0-beta16",
+    "@rails/ujs": "^7.1.400",
+    "tailwindcss": "^3.4.17"
+  }
+}

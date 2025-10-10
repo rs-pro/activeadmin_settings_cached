@@ -13,7 +13,7 @@ module ActiveadminSettingsCached
     # @option options [String] :display, display settings override (default: nil)
     # @option options [String] :title, title value override (default: I18n.t('settings.menu.label'))
     # @option options [Proc] :after_save, callback for action after page update, (default: nil)
-    def active_admin_settings_page(options = {}, &block)
+    def active_admin_settings_page(options = {}, &)
       options.assert_valid_keys(*ActiveadminSettingsCached::Options::VALID_OPTIONS)
 
       options = ActiveadminSettingsCached::Options.options_for(options)
@@ -31,16 +31,15 @@ module ActiveadminSettingsCached
           options[:template_object].save(field_name, value)
         end
 
-        # coercion.cast_params(settings_params) do |name, value|
-        #   options[:template_object].save(name, value)
-        # end
+        flash[:success] = t('activeadmin_settings_cached.settings.update.success')
 
-        flash[:success] = t('activeadmin_settings_cached.settings.update.success'.freeze)
-        Rails.version.to_i >= 5 ? redirect_back(fallback_location: admin_root_path) : redirect_to(:back)
+        # Rails 7+ uses redirect_back_or_to
+        redirect_back_or_to admin_root_path
+
         options[:after_save].call if options[:after_save].respond_to?(:call)
       end
 
-      instance_eval(&block) if block_given?
+      instance_eval(&) if block_given?
     end
   end
 end

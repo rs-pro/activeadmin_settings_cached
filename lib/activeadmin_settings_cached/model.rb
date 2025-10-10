@@ -19,29 +19,28 @@ module ActiveadminSettingsCached
 
       input_opts = if default_value.is_a?(Array)
                      {
-                       collection: default_value,  #TODO: allow multiply for colleactions
-                       selected: value,
+                       collection: default_value, # TODO: allow multiply for colleactions
+                       selected: value
                      }
-                   elsif (field_name.include?("time") || field_name.include?("hour"))
-                   {
+                   elsif field_name.include?('time') || field_name.include?('hour')
+                     {
                        as: :time_picker,
-                       input_html: { value: value, placeholder: default_value },
-                   }
-                   elsif (default_value.is_a?(TrueClass) || default_value.is_a?(FalseClass))
+                       input_html: { value: value, placeholder: default_value }
+                     }
+                   elsif default_value.is_a?(TrueClass) || default_value.is_a?(FalseClass)
                      {
                        as: :boolean,
                        input_html: { checked: value }, label: '', checked_value: 'true', unchecked_value: 'false'
                      }
 
-
-                   #elsif (default_value.is_a?(TrueClass) || default_value.is_a?(FalseClass)) &&
+                   # elsif (default_value.is_a?(TrueClass) || default_value.is_a?(FalseClass)) &&
                    #      display[settings_name].to_s == 'boolean'
                    #  {
                    #    input_html: { checked: value }, label: '', checked_value: 'true', unchecked_value: 'false'
                    #  }
                    else
                      {
-                       input_html: { value: value, placeholder: default_value },
+                       input_html: { value: value, placeholder: default_value }
                      }
                    end
 
@@ -68,7 +67,7 @@ module ActiveadminSettingsCached
       false
     end
 
-    alias_method :to_hash, :attributes
+    alias to_hash attributes
 
     private
 

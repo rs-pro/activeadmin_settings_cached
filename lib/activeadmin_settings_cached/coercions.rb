@@ -7,9 +7,7 @@ module ActiveadminSettingsCached
   class Coercions
     TRUE_VALUES = %w[1 on On ON t true True TRUE T y yes Yes YES Y].freeze
     FALSE_VALUES = %w[0 off Off OFF f false False FALSE F n no No NO N].freeze
-    BOOLEAN_MAP = ::Hash[
-      TRUE_VALUES.product([true]) + FALSE_VALUES.product([false])
-    ].freeze
+    BOOLEAN_MAP = (TRUE_VALUES.product([true]) + FALSE_VALUES.product([false])).to_h.freeze
 
     attr_reader :defaults
 
@@ -31,12 +29,9 @@ module ActiveadminSettingsCached
 
     private
 
-    
+    def cast_value(name, value); end
+
     def cast_value(name, value)
-    end
-
-
-    def cast_value(name, value) # rubocop:disable Metrics/MethodLength
       case defaults[name]
       when TrueClass, FalseClass
         -> { BOOLEAN_MAP.fetch(value, false) }
