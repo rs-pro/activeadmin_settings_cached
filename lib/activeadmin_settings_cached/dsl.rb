@@ -17,26 +17,17 @@ module ActiveadminSettingsCached
       options.assert_valid_keys(*ActiveadminSettingsCached::Options::VALID_OPTIONS)
 
       options = ActiveadminSettingsCached::Options.options_for(options)
-      # coercion =
-      #   ActiveadminSettingsCached::Coercions.new(options[:template_object].defaults)
-
       content title: options[:title] do
         render partial: options[:template], locals: { settings_model: options[:template_object] }
       end
 
       page_action :update, method: :post do
-        settings_params = params.require(:settings).permit!
+        settings = options[:template_object]
+        submitted = params.require(:settings).permit(*settings.settings.keys).to_h
+        submitted.each { |name, value| settings.save(name, value) }
 
-        settings_params.each do |field_name, value|
-          options[:template_object].save(field_name, value)
-        end
-
-        # coercion.cast_params(settings_params) do |name, value|
-        #   options[:template_object].save(name, value)
-        # end
-
-        flash[:success] = t('activeadmin_settings_cached.settings.update.success'.freeze)
-        Rails.version.to_i >= 5 ? redirect_back(fallback_location: admin_root_path) : redirect_to(:back)
+        flash[:notice] = t('activeadmin_settings_cached.settings.update.success')
+        redirect_to url_for(action: :index)
         options[:after_save].call if options[:after_save].respond_to?(:call)
       end
 

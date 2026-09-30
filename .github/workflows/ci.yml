@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ['3.4', '4.0']
+        rails: ['~> 7.2', '~> 8.0']
+        exclude:
+          - ruby: '4.0'
+            rails: '~> 7.2'
+    env:
+      RAILS_VERSION: ${{ matrix.rails }}
+      RAILS_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Build demo stylesheet (Tailwind CLI, no npm)
+        run: bundle exec rake -f examples/demo/Rakefile assets:build
+      - name: Run unit and Chrome/Cuprite system specs
+        run: bundle exec rspec

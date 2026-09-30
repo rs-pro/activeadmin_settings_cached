@@ -1,6 +1,6 @@
 <div>
-  <%= semantic_form_for :settings, :method => :post, url: {action: :update} do |f| %>
-    <table id="settings" class="index_table index">
+  <%= semantic_form_for :settings, method: :post, url: {action: :update} do |f| %>
+    <table id="settings" class="w-full text-sm text-start border-collapse">
       <thead>
         <tr>
           <th style="width: 30%"><%= t('settings.index.name')%></th>
@@ -9,7 +9,7 @@
       </thead>
       <tbody>
         <% settings_model.settings.sort.to_h.each_pair do |field_name, value| %>
-          <tr class="odd">
+          <tr class="border-b border-gray-200 dark:border-gray-700">
             <td><strong><%= f.label field_name, t("settings.attributes.#{field_name}", default: field_name) %></strong></td>
             <td>
               <div class='form'>

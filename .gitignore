@@ -8,6 +8,8 @@
 /spec/reports/
 /spec/rails/
 /tmp/
+/examples/demo/tmp/
+/examples/demo/app/assets/active_admin.css
 *.bundle
 *.so
 *.o
@@ -16,3 +18,4 @@
 .idea
 mkmf.log
 /gemfiles/*.lock
+/*.gem

@@ -107,3 +107,11 @@ en:
 # v0.0.1 2014-11-30
 
 First public release
+# v3.0.0.beta1
+
+## Changed
+
+- Require ActiveAdmin 4, Rails 7.2+ and rails-settings-cached 2.9+.
+- Use defined editable fields, typed Formtastic inputs and scoped pages.
+- Replace PhantomJS and generated Rails 5.1 tests with a Rails demo and Chrome/Cuprite system tests.
+- Build demo styles with the Tailwind CLI; no npm package is required.

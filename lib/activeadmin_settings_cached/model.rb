@@ -4,99 +4,46 @@ module ActiveadminSettingsCached
   class Model
     include ::ActiveModel::Model
 
-    attr_reader :attributes
+    attr_reader :settings_model, :display
 
-    def initialize(args = {})
-      @attributes = {}
-      args[:model_name] = args[:model_name].constantize if args[:model_name].is_a? String
-      args[:display] = default_attributes[:display].merge!(args[:display]) if args[:display]
-      assign_attributes(merge_attributes(args))
-    end
-
-    def field_options(field_name, value)
-      field = settings_model.get_field(field_name)
-      default_value = field[:default]
-
-      input_opts = if default_value.is_a?(Array)
-                     {
-                       collection: default_value,  #TODO: allow multiply for colleactions
-                       selected: value,
-                     }
-                   elsif (field_name.include?("time") || field_name.include?("hour"))
-                   {
-                       as: :time_picker,
-                       input_html: { value: value, placeholder: default_value },
-                   }
-                   elsif (default_value.is_a?(TrueClass) || default_value.is_a?(FalseClass))
-                     {
-                       as: :boolean,
-                       input_html: { checked: value }, label: '', checked_value: 'true', unchecked_value: 'false'
-                     }
-
-
-                   #elsif (default_value.is_a?(TrueClass) || default_value.is_a?(FalseClass)) &&
-                   #      display[settings_name].to_s == 'boolean'
-                   #  {
-                   #    input_html: { checked: value }, label: '', checked_value: 'true', unchecked_value: 'false'
-                   #  }
-                   else
-                     {
-                       input_html: { value: value, placeholder: default_value },
-                     }
-                   end
-
-      { as: display[field_name], label: false }
-        .merge!(input_opts)
+    def initialize(model_name: nil, display: {}, starting_with: nil, **)
+      @settings_model = model_name ? model_name.to_s.constantize : ActiveadminSettingsCached.config.model_name
+      @display = ActiveadminSettingsCached.config.display.merge(display.stringify_keys)
+      @starting_with = starting_with
     end
 
     def settings
-      settings_values = load_settings_values
-      return unless settings_values
-
-      ::ActiveSupport::OrderedHash[settings_values.to_a.sort { |a, b| a.first <=> b.first }]
+      keys = settings_model.editable_keys
+      keys = keys.select { |key| key.start_with?(@starting_with) } if @starting_with
+      keys.sort.to_h { |key| [key, settings_model.public_send(key)] }
     end
 
-    def display
-      attributes[:display]
-    end
-
-    def save(field_name, value)
-      settings_model.public_send("#{field_name}=", value)
-    end
-
-    def persisted?
-      false
-    end
-
-    alias_method :to_hash, :attributes
-
-    private
-
-    def load_settings_values
-      settings_model.keys.each_with_object({}) do |key, acc|
-        acc[key] = settings_model.public_send(key)
+    def field_options(name, value)
+      field = settings_model.get_field(name)
+      type = field[:type].to_sym
+      kind = display[name] || case type
+                              when :boolean then :boolean
+                              when :array then :text
+                              when :integer, :float then :number
+                              else :string
+                              end
+      options = { as: kind, label: false }
+      if kind.to_sym == :boolean
+        options[:input_html] = { checked: value == true }
+      elsif kind.to_sym == :select
+        options[:collection] = field.dig(:options, :option_values) || field[:default]
+        options[:selected] = value
+      else
+        options[:input_html] = { value: value.is_a?(Array) ? value.join("\n") : value }
+        options[:input_html][:step] = 'any' if type == :float && kind.to_sym == :number
       end
+      options
     end
 
-    def assign_attributes(args = {})
-      @attributes.merge!(args)
-    end
+    def save(name, value)
+      raise ArgumentError, "Unknown or read-only setting: #{name}" unless settings.key?(name)
 
-    def default_attributes
-      {
-        model_name: ::ActiveadminSettingsCached.config.model_name,
-        display: ::ActiveadminSettingsCached.config.display
-      }
-    end
-
-    def merge_attributes(args)
-      default_attributes.each_with_object({}) do |(k, v), h|
-        h[k] = args[k] || v
-      end
-    end
-
-    def settings_model
-      attributes[:model_name]
+      settings_model.public_send("#{name}=", value)
     end
   end
 end
